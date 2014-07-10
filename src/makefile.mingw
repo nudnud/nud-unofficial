@@ -27,7 +27,7 @@ INCLUDEPATHS= \
  -I"$(CURDIR)" \
  -I"c:/deps/boost_1_55_0" \
  -I"c:/deps/db-4.8.30.NC/build_unix" \
- -I"c:/deps/openssl-1.0.1g/include" \
+ -I"c:/deps/openssl-1.0.1h/include" \
  -I"$(DEPSDIR)/include" \
  -I"$(DEPSDIR)/miniupnpc"
 
@@ -35,7 +35,7 @@ LIBPATHS= \
  -L"$(CURDIR)/leveldb" \
  -L"c:/deps/boost_1_55_0/stage/lib" \
  -L"c:/deps/db-4.8.30.NC/build_unix" \
- -L"c:/deps/openssl-1.0.1g"
+ -L"c:/deps/openssl-1.0.1h"
 
 LIBS= \
  -l leveldb \

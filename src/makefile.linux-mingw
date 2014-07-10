@@ -9,21 +9,15 @@ CXX := i686-w64-mingw32-g++
 
 USE_UPNP:=0
 USE_IPV6:=1
-DEPSDIR?=/c/deps
-BOOST_SUFFIX?=-mgw48-mt-s-1_55
+
 INCLUDEPATHS= \
  -I"$(CURDIR)" \
- -I"c:/deps/boost_1_55_0" \
- -I"c:/deps/db-4.8.30.NC/build_unix" \
- -I"c:/deps/openssl-1.0.1g/include" \
+ -I"$(CURDIR)"/obj \
  -I"$(DEPSDIR)/include" \
- -I"$(DEPSDIR)/miniupnpc"
+ -I"$(DEPSDIR)"
 
 LIBPATHS= \
- -L"$(CURDIR)/leveldb" \
- -L"c:/deps/boost_1_55_0/stage/lib" \
- -L"c:/deps/db-4.8.30.NC/build_unix" \
- -L"c:/deps/openssl-1.0.1g"
+ -L"$(DEPSDIR)/lib"
 
 LIBS= \
   $(CURDIR)/leveldb/libleveldb.a $(CURDIR)/leveldb/libmemenv.a \

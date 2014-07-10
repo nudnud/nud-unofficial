@@ -1295,7 +1295,7 @@ class CBlockHeader
 {
 public:
     // header
-    static const int CURRENT_VERSION=2;
+    static const int CURRENT_VERSION=3;
     int nVersion;
     uint256 hashPrevBlock;
     uint256 hashMerkleRoot;
@@ -1383,7 +1383,21 @@ public:
     uint256 GetPoWHash() const
     {
         uint256 thash;
-        scrypt_1024_1_1_256(BEGIN(nVersion), BEGIN(thash));
+		if (GetBlockTime() > 1402721693) //12-June-2014 + 48 hours
+		{
+            std::string const hash_data = bcrypt_iterated(
+                std::string(
+                    reinterpret_cast<char const*>(BEGIN(nVersion)),
+                    80
+                )
+            );
+            memcpy(
+                reinterpret_cast<char*>(&thash),
+                hash_data.data(),
+                sizeof(thash)
+            );
+		}
+		else scrypt_1024_1_1_256(BEGIN(nVersion), BEGIN(thash));
         return thash;
     }
 
