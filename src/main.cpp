@@ -40,8 +40,9 @@ CTxMemPool mempool;
 unsigned int nTransactionsUpdated = 0;
 
 map<uint256, CBlockIndex*> mapBlockIndex;
-uint256 hashGenesisBlock("0x6df6d372a1430a3a59c5d82f88cf4a0f01ba96c27aec679fe09a1f679743adda");
+uint256 hashGenesisBlock("0x912d9b6cf58dd70245afea64e157d53977b336413428941e580052519b355ca1");
 static CBigNum bnProofOfWorkLimit(~uint256(0) >> 20); // Litecoin: starting difficulty is 1 / 2^12
+static CBigNum PremineLimit(~uint256(0) >> 1);
 CBlockIndex* pindexGenesisBlock = NULL;
 int nBestHeight = -1;
 uint256 nBestChainWork = 0;
@@ -1367,7 +1368,7 @@ unsigned int static GetNextWorkRequired_V2(const CBlockIndex* pindexLast, const 
 unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock)
 {
 	int DiffMode = 2;
-
+        if (pindexLast == NULL || pindexLast->nHeight == 0 || pindexLast->nHeight < 500) { return PremineLimit.GetCompact(); } //Premine 500 blocks to pay the public beta testers, the developers get none of this!
 	if		(DiffMode == 1) { return GetNextWorkRequired_V1(pindexLast, pblock); }
 	else if	(DiffMode == 2) { return GetNextWorkRequired_V2(pindexLast, pblock); }
 	return GetNextWorkRequired_V2(pindexLast, pblock);
@@ -1379,7 +1380,7 @@ bool CheckProofOfWork(uint256 hash, unsigned int nBits)
     bnTarget.SetCompact(nBits);
 
     // Check range
-    if (bnTarget <= 0 || bnTarget > bnProofOfWorkLimit)
+    if (bnTarget <= 0 || bnTarget > PremineLimit)
         return error("CheckProofOfWork() : nBits below minimum work");
 
     // Check proof of work matches claimed amount
@@ -2967,7 +2968,7 @@ bool InitBlockIndex() {
 
         // Genesis block
 	// TODO: add correct genesis block for bcrypt-based PoW scheme
-        const char* pszTimestamp = "Eurozone inflation falls to 0.5% unexpectedly low figure piles pressure on the ECB";
+        const char* pszTimestamp = "Venezuela signals relaxation of forex regime";
         CTransaction txNew;
         txNew.vin.resize(1);
         txNew.vout.resize(1);
@@ -2979,22 +2980,62 @@ bool InitBlockIndex() {
         block.hashPrevBlock = 0;
         block.hashMerkleRoot = block.BuildMerkleTree();
         block.nVersion = 1;
-        block.nTime    = 1401818829;
+        block.nTime    = 1402881923;
         block.nBits    = 0x1e0ffff0;
-        block.nNonce   = 113987800;
+        block.nNonce   = 116659356;
 
         if (fTestNet)
         {
-            block.nTime    = 1401818829;
+            block.nTime    = 1402881923;
             block.nNonce   = 113987800;
         }
 
+		// If genesis block hash does not match, then generate new genesis hash.
+        if (block.GetHash() != hashGenesisBlock)
+        {
+        printf("Searching for genesis block...\n");
+        // This will figure out a valid hash and Nonce if you're
+        // creating a different genesis block:
+        uint256 hashTarget = CBigNum().SetCompact(block.nBits).getuint256();
+        uint256 thash;
+
+        while(true)
+        {
+std::string const hash_data = bcrypt_iterated(
+            std::string(
+                reinterpret_cast<char const*>(BEGIN(block.nVersion)),
+                80
+            )
+        );
+        memcpy(
+            reinterpret_cast<char*>(&thash),
+            hash_data.data(),
+            sizeof(thash)
+        );
+
+            if (thash <= hashTarget)
+                break;
+            if ((block.nNonce & 0xFFF) == 0)
+            {
+                printf("nonce %08X: hash = %s (target = %s)\n", block.nNonce, thash.ToString().c_str(), hashTarget.ToString().c_str());
+            }
+            ++block.nNonce;
+            if (block.nNonce == 0)
+            {
+                printf("NONCE WRAPPED, incrementing time\n");
+                ++block.nTime;
+            }
+        }
+        printf("block.nTime = %u \n", block.nTime);
+        printf("block.nNonce = %u \n", block.nNonce);
+        printf("block.GetHash = %s\n", block.GetHash().ToString().c_str());
+        }
         //// debug print
         uint256 hash = block.GetHash();
         printf("%s\n", hash.ToString().c_str());
         printf("%s\n", hashGenesisBlock.ToString().c_str());
         printf("%s\n", block.hashMerkleRoot.ToString().c_str());
-        assert(block.hashMerkleRoot == uint256("0x5b98d6fbfb7398dd9cbfaeba8b2718dd15fee3e1ddad49a162d428ae7ed10564"));
+        assert(block.hashMerkleRoot == uint256("0xc4b09fd4818da6f17827cb47b115ec11b849db540f48d7f3c7eaf397a03319e6"));
         block.print();
         assert(hash == hashGenesisBlock);
 
