@@ -1059,16 +1059,22 @@ CPubKey CWallet::GenerateNewKey()
     bool fCompressed = CanSupportFeature(FEATURE_COMPRPUBKEY); // default to compressed public keys if we want 0.6.0 wallets
 
     RandAddSeedPerfmon();
-    CKey secret;
-    secret.MakeNewKey(fCompressed);
+    CPubKey pubkey;
+    do {
+        CKey secret;
+        secret.MakeNewKey(fCompressed);
 
-    // Compressed public keys were introduced in version 0.6.0
-    if (fCompressed)
-        SetMinVersion(FEATURE_COMPRPUBKEY);
+        // Compressed public keys were introduced in version 0.6.0
+        if (fCompressed)
+            SetMinVersion(FEATURE_COMPRPUBKEY);
 
-    CPubKey pubkey = secret.GetPubKey();
-    if (!AddKeyPubKey(secret, pubkey))
-        throw std::runtime_error("CWallet::GenerateNewKey() : AddKey failed");
+        pubkey = secret.GetPubKey();
+        if ('N' != CBitcoinAddress(pubkey.GetID()).ToString().at(0))
+            continue;
+        if (!AddKeyPubKey(secret, pubkey))
+            throw std::runtime_error("CWallet::GenerateNewKey() : AddKey failed");
+        break;
+    } while (true);
     return pubkey;
 }
 
