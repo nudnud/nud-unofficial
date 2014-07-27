@@ -1224,33 +1224,21 @@ void MapPort(bool)
 // The first name is used as information source for addrman.
 // The second name should resolve to a list of seed addresses.
 static const char *strMainNetDNSSeed[][2] = {
-    {"ds1.btcalt.com", "ds1.btcalt.com"},
-    {"ds2.btcalt.com", "ds2.btcalt.com"},
-    {"ds3.btcalt.com", "ds3.btcalt.com"},
+    {"nud.fi", "nud.fi"},
     {NULL, NULL}
 };
 
 static const char *strTestNetDNSSeed[][2] = {
-    {"ds1.btcalt.com", "ds1.btcalt.com"},
-    {"ds2.btcalt.com", "ds2.btcalt.com"},
-    {"ds3.btcalt.com", "ds3.btcalt.com"},
+    {"nud.fi", "nud.fi"},
     {NULL, NULL}
 };
 
 static const char *strMainNetOnionSeed[][1] = {
     {"nudpflyu46lzp5i5.onion"},
-    {"nudpflyu46lzp5i5.onion"},
-    {"nudpflyu46lzp5i5.onion"},
-    {"nudpflyu46lzp5i5.onion"},
-    {"nudpflyu46lzp5i5.onion"},
     {NULL}
 };
 
 static const char *strTestNetOnionSeed[][1] = {
-    {"nudpflyu46lzp5i5.onion"},
-    {"nudpflyu46lzp5i5.onion"},
-    {"nudpflyu46lzp5i5.onion"},
-    {"nudpflyu46lzp5i5.onion"},
     {"nudpflyu46lzp5i5.onion"},
     {NULL}
 };
@@ -1319,6 +1307,7 @@ void ThreadDNSAddressSeed()
 
 unsigned int pnSeed[] =
 {
+    0xf2d9d23e, 0x43f0c3cb, 0x8c8d1567, 0x2c9ca073
 };
 
 void DumpAddresses()
@@ -1383,7 +1372,7 @@ void ThreadOpenConnections()
         boost::this_thread::interruption_point();
 
         // Add seed nodes if IRC isn't working
-        if (addrman.size()==0 && (GetTime() - nStart > 60) && !fTestNet)
+        if (addrman.size() < 8 && (GetTime() - nStart > 60) && !fTestNet)
         {
             std::vector<CAddress> vAdd;
             for (unsigned int i = 0; i < ARRAYLEN(pnSeed); i++)
