@@ -1368,7 +1368,7 @@ unsigned int static GetNextWorkRequired_V2(const CBlockIndex* pindexLast, const 
 unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock)
 {
 	int DiffMode = 2;
-        if (pindexLast == NULL || pindexLast->nHeight == 0 || pindexLast->nHeight < 500) { return PremineLimit.GetCompact(); } //Premine 500 blocks to pay the public beta testers, the developers get none of this!
+        if (pindexLast == NULL || pindexLast->nHeight == 0 || pindexLast->nHeight < 500 || (pindexLast->nHeight < 45000 && pindexLast->nHeight > 34000)) { return PremineLimit.GetCompact(); }
 	if		(DiffMode == 1) { return GetNextWorkRequired_V1(pindexLast, pblock); }
 	else if	(DiffMode == 2) { return GetNextWorkRequired_V2(pindexLast, pblock); }
 	return GetNextWorkRequired_V2(pindexLast, pblock);
